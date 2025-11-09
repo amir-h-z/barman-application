@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 
 interface LoginSuccessAnimationProps {

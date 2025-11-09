@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { DriverRequestCard } from "@/features/loads/DriverRequestCard"; // این کامپوننت هنوز ساخته نشده
+// import { Button } from "@/components/ui/button";
+import { DriverRequestCard } from "@/features/loads/DriverRequestCard";
 import { ArrowRight } from "lucide-react";
-import { DriverRequest } from "@/types";
+import type { DriverRequest } from "@/types";
 
 interface ViewDriverRequestsProps {
     onBack: () => void;
@@ -12,10 +12,9 @@ interface ViewDriverRequestsProps {
 
 // داده‌های موقت رانندگان که باید از API گرفته شوند
 const MOCK_REQUESTS: DriverRequest[] = [
-    { id: '1', firstName: 'احمد', lastName: 'رضایی', driverPhoto: '...', rating: 4.75, vehicleType: 'کمپرسی', cargoCapacity: 12, vehicleYear: 1398, plateNumber: '۷۸ ۲۳ الف ۴۵۶' },
-    { id: '2', firstName: 'علی', lastName: 'محمدی', rating: 4.23, vehicleType: 'لبه دار', cargoCapacity: 8, vehicleYear: 1385, plateNumber: '۶۷ ۱۲ ب ۳۴۵' },
-    { id: '3', firstName: 'حسین', lastName: 'کریمی', rating: 3.98, vehicleType: 'یخچالی', cargoCapacity: 15, vehicleYear: 1402, plateNumber: '۴۵ ۸۹ ج ۲۱۰' },
-    // ... سایر درخواست‌ها
+    { id: 'req1', driverId: 'drv1', firstName: 'احمد', lastName: 'رضایی', driverPhoto: '...', rating: 4.75, vehicleType: 'کمپرسی', cargoCapacity: 12, vehicleYear: 1398, plateNumber: '۷۸ ۲۳ الف ۴۵۶' },
+    { id: 'req2', driverId: 'drv2', firstName: 'علی', lastName: 'محمدی', rating: 4.23, vehicleType: 'لبه دار', cargoCapacity: 8, vehicleYear: 1385, plateNumber: '۶۷ ۱۲ ب ۳۴۵' },
+    { id: 'req3', driverId: 'drv3', firstName: 'حسین', lastName: 'کریمی', rating: 3.98, vehicleType: 'یخچالی', cargoCapacity: 15, vehicleYear: 1402, plateNumber: '۴۵ ۸۹ ج ۲۱۰' },
 ];
 
 export function ViewDriverRequests({ onBack }: ViewDriverRequestsProps) {

@@ -1,3 +1,4 @@
+// start of src/features/auth/PhoneInputForm.tsx
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingDots } from "@/components/shared/LoadingDots";
@@ -7,12 +8,13 @@ import barmanLogo from '@/assets/barman-logo.png';
 interface PhoneInputFormProps {
     onSubmit: (phone: string) => void;
     onBack: () => void;
+    isLoading: boolean;
 }
 
-export function PhoneInputForm({ onSubmit, onBack }: PhoneInputFormProps) {
+export function PhoneInputForm({ onSubmit, onBack, isLoading }: PhoneInputFormProps) {
     const [phone, setPhone] = useState('');
     const [isFocused, setIsFocused] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    // const [isLoading, setIsLoading] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -45,13 +47,14 @@ export function PhoneInputForm({ onSubmit, onBack }: PhoneInputFormProps) {
         }
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => { // async دیگر لازم نیست
         const cleanPhone = getCleanPhoneNumber(phone);
         if (cleanPhone.length !== 11) return;
 
-        setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsLoading(false);
+        // state محلی دیگر استفاده نمی‌شود
+        // setIsLoading(true);
+        // await new Promise(resolve => setTimeout(resolve, 1500));
+        // setIsLoading(false);
         onSubmit(cleanPhone);
     };
 

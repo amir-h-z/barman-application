@@ -1,5 +1,5 @@
 import apiClient from './index';
-import { User } from '@/types';
+import type { User } from '@/types';
 
 
 export const loginRequest = async (identifier: string, role: string): Promise<{ message: string }> => {

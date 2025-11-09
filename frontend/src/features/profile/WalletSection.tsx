@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { Wallet, Calendar, Filter, ArrowUp, ArrowDown, X, CalendarIcon, ArrowRight } from "lucide-react";
-import { LoadingDots } from "@/components/shared/LoadingDots";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Transaction } from "@/types";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Wallet, Calendar, Filter, ArrowUp, ArrowDown, ArrowRight } from "lucide-react";
+import type { Transaction } from "@/types"; // Import as type
 
-// TODO: داده‌های موقت باید از API گرفته شوند
-import { MOCK_DRIVER_TRANSACTIONS, MOCK_CARGO_OWNER_TRANSACTIONS } from "@/api/mock-data";
+const MOCK_DRIVER_TRANSACTIONS: Transaction[] = [
+    { id: '1', title: 'واریز کرایه سفر #123', amount: 2500000, type: 'income', date: '۱۴۰۳/۰۹/۲۰', status: 'completed' },
+    { id: '2', title: 'تسویه حساب', amount: 2000000, type: 'expense', date: '۱۴۰۳/۰۹/۱۹', status: 'completed' },
+];
+const MOCK_CARGO_OWNER_TRANSACTIONS: Transaction[] = [
+    { id: '3', title: 'شارژ کیف پول', amount: 5000000, type: 'income', date: '۱۴۰۳/۰۹/۱۸', status: 'completed' },
+    { id: '4', title: 'پرداخت کرایه سفر #456', amount: 1750000, type: 'expense', date: '۱۴۰۳/۰۹/۱۷', status: 'completed' },
+];
 
 interface WalletSectionProps {
     userRole: 'driver' | 'cargo-owner' | 'transport-company';
@@ -23,7 +23,6 @@ const formatPrice = (price: number) => new Intl.NumberFormat('fa-IR').format(pri
 
 export function WalletSection({ userRole, onBack }: WalletSectionProps) {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [isApplyingFilter, setIsApplyingFilter] = useState(false);
 
     // TODO: این داده‌ها باید از هوک useWallet بیایند
     const walletBalance = userRole === 'driver' ? 2450000 : 3250000;
@@ -64,34 +63,41 @@ export function WalletSection({ userRole, onBack }: WalletSectionProps) {
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="space-y-0 max-h-[60vh] overflow-y-auto">
-                            {transactions.map((transaction, index) => (
-                                <div key={transaction.id}>
-                                    <div className="p-4 flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            {transaction.type === 'income' ? <ArrowDown className="w-4 h-4 text-green-600"/> : <ArrowUp className="w-4 h-4 text-red-600"/>}
-                                            <div className={`text-sm font-medium ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                                                {transaction.type === 'income' ? '+' : '-'}{formatPrice(transaction.amount)} تومان
+                            {transactions.length > 0 ? (
+                                transactions.map((transaction, index) => (
+                                    <div key={transaction.id}>
+                                        <div className="p-4 flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                {transaction.type === 'income' ? <ArrowDown className="w-4 h-4 text-green-600"/> : <ArrowUp className="w-4 h-4 text-red-600"/>}
+                                                <div className={`text-sm font-medium ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                                                    {transaction.type === 'income' ? '+' : '-'}{formatPrice(transaction.amount)} تومان
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 text-right mr-4">
+                                                <div className="font-medium text-sm">{transaction.title}</div>
+                                                <div className="text-xs text-muted-foreground">{transaction.date}</div>
                                             </div>
                                         </div>
-                                        <div className="flex-1 text-right mr-4">
-                                            <div className="font-medium text-sm">{transaction.title}</div>
-                                            <div className="text-xs text-muted-foreground">{transaction.date}</div>
-                                        </div>
+                                        {index < transactions.length - 1 && <div className="border-b mx-4"/>}
                                     </div>
-                                    {index < transactions.length - 1 && <div className="border-b mx-4"/>}
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <div className="p-8 text-center text-muted-foreground">تراکنشی یافت نشد.</div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* شیت فیلتر */}
-            {/* The full code for the filter sheet is omitted for brevity but should be the same as in the original `wallet-section` files */}
             <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                <SheetContent side="bottom" className="h-[80vh] rounded-t-2xl">
-                    <SheetHeader><SheetTitle>فیلتر تراکنش ها</SheetTitle></SheetHeader>
-                    {/* ... محتوای کامل فیلتر شیت ... */}
+                <SheetContent side="bottom" className="h-auto rounded-t-2xl">
+                    <SheetHeader>
+                        <SheetTitle className="text-center">فیلتر تراکنش ها</SheetTitle>
+                    </SheetHeader>
+                    <div className="p-4 space-y-4">
+                        <p className="text-center text-muted-foreground">گزینه‌های فیلتر در اینجا قرار می‌گیرند.</p>
+                        <Button className="w-full" onClick={() => setIsFilterOpen(false)}>اعمال فیلتر</Button>
+                    </div>
                 </SheetContent>
             </Sheet>
         </div>

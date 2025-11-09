@@ -40,6 +40,13 @@ export interface UserProfile extends User {
     patoghDrivers?: { id: string; name: string; code: string }[];
 }
 
+export interface Driver {
+    id: string;
+    name: string;
+    nationalId: string;
+    code?: string;
+}
+
 // اطلاعات یک بار
 export interface Load {
     id: string;
@@ -98,6 +105,19 @@ export interface Trip {
     receiverPhone?: string;
 }
 
+export interface DriverRequest {
+    id: string; // شناسه یکتای درخواست (نه راننده)
+    driverId: string;
+    firstName: string;
+    lastName: string;
+    driverPhoto?: string;
+    rating: number;
+    vehicleType: string;
+    cargoCapacity: number;
+    vehicleYear: number;
+    plateNumber: string;
+}
+
 // اطلاعات یک حساب بانکی
 export interface BankAccount {
     id: string;
@@ -142,4 +162,42 @@ export interface Message {
     text: string;
     timestamp: string;
     status: 'sent' | 'delivered' | 'read';
+}
+
+export interface LoadFilters {
+    dateRange: { from?: Date; to?: Date };
+    priceRange: [number, number];
+    truckType: string;
+    cargoType: string;
+    weightRange: [number, number];
+    origin: string;
+    destination: string;
+}
+
+export type NewLoadData = Omit<Load, 'id' | 'ownerName' | 'coordinates' | 'date' | 'origin' | 'destination' | 'originProvince' | 'destinationProvince'> & {
+    origin: { province: string; city: string; address: string };
+    destination: { province: string; city: string; address: string };
+};
+
+export interface TripFilters {
+    status?: 'ongoing' | 'completed' | 'cancelled';
+    search?: string;
+}
+
+export type TripStatus = 'loading' | 'in-transit' | 'delivery' | 'completed';
+
+export interface RatingPayload {
+    targetUserId: string;
+    rating: number;
+    comment?: string;
+    positiveTags?: string[];
+    negativeTags?: string[];
+}
+
+export interface TransactionFilters {
+    type?: 'income' | 'expense';
+    dateFrom?: string;
+    dateTo?: string;
+    minAmount?: number;
+    maxAmount?: number;
 }

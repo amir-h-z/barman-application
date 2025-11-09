@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FloatingInput } from "@/components/ui/floating-input";
 import { FloatingTextarea } from "@/components/ui/floating-textarea";
@@ -9,9 +9,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { LoadingDots } from "@/components/shared/LoadingDots";
 import { CustomAccordion } from "@/components/ui/custom-accordion";
 import { CalendarIcon, ArrowRight } from "lucide-react";
-import { format } from "date-fns-jalali"; // برای تاریخ شمسی
+import { format } from "date-fns-jalali";
 import { toast } from "sonner";
-import { Load, NewLoadData } from "@/types";
+import type { Load } from "@/types";
+import type { NewLoadData } from "@/types";
 
 interface CreateLoadFormProps {
     onBack: () => void;
@@ -21,6 +22,10 @@ interface CreateLoadFormProps {
 }
 
 export function CreateLoadForm({ onBack, onSubmit, isEdit = false, initialData = {} }: CreateLoadFormProps) {
+    // Helper functions to safely access initial data
+    const getInitialSender = () => (typeof initialData.sender === 'object' ? initialData.sender : { firstName: '', lastName: '', phone: '' });
+    const getInitialReceiver = () => (typeof initialData.receiver === 'object' ? initialData.receiver : { firstName: '', lastName: '', phone: '' });
+
     const [cargoType, setCargoType] = useState(initialData.cargoType || "");
     const [price, setPrice] = useState(initialData.price?.toString() || "");
     const [truckType, setTruckType] = useState(initialData.truckType || "");
@@ -31,26 +36,25 @@ export function CreateLoadForm({ onBack, onSubmit, isEdit = false, initialData =
     const [description, setDescription] = useState(initialData.description || "");
 
     const [originProvince, setOriginProvince] = useState(initialData.originProvince || "");
-    const [originCity, setOriginCity] = useState(initialData.originCity || "");
+    const [originCity, setOriginCity] = useState(initialData.origin || "");
     const [originAddress, setOriginAddress] = useState(initialData.originAddress || "");
     const [destinationProvince, setDestinationProvince] = useState(initialData.destinationProvince || "");
-    const [destinationCity, setDestinationCity] = useState(initialData.destinationCity || "");
+    const [destinationCity, setDestinationCity] = useState(initialData.destination || "");
     const [destinationAddress, setDestinationAddress] = useState(initialData.destinationAddress || "");
 
-    const [senderFirstName, setSenderFirstName] = useState(initialData.sender?.firstName || "");
-    const [senderLastName, setSenderLastName] = useState(initialData.sender?.lastName || "");
-    const [senderPhone, setSenderPhone] = useState(initialData.sender?.phone || "");
+    const [senderFirstName, setSenderFirstName] = useState(getInitialSender().firstName);
+    const [senderLastName, setSenderLastName] = useState(getInitialSender().lastName);
+    const [senderPhone, setSenderPhone] = useState(getInitialSender().phone);
 
-    const [receiverFirstName, setReceiverFirstName] = useState(initialData.receiver?.firstName || "");
-    const [receiverLastName, setReceiverLastName] = useState(initialData.receiver?.lastName || "");
-    const [receiverPhone, setReceiverPhone] = useState(initialData.receiver?.phone || "");
+    const [receiverFirstName, setReceiverFirstName] = useState(getInitialReceiver().firstName);
+    const [receiverLastName, setReceiverLastName] = useState(getInitialReceiver().lastName);
+    const [receiverPhone, setReceiverPhone] = useState(getInitialReceiver().phone);
 
     const [isSenderMyself, setIsSenderMyself] = useState(initialData.isSenderMyself || false);
     const [isReceiverMyself, setIsReceiverMyself] = useState(initialData.isReceiverMyself || false);
 
     const [isLoading, setIsLoading] = useState(false);
 
-    // داده‌های ثابت از پروژه اصلی استخراج شده‌اند
     const provinces = ["تهران", "اصفهان", "فارس", "خراسان رضوی", "آذربایجان شرقی", "مازندران", "کرمان", "خوزستان"];
     const citiesByProvince: { [key: string]: string[] } = { تهران: ["تهران", "شهریار", "قدس"], اصفهان: ["اصفهان", "کاشان"] };
     const cargoTypes = ["مواد غذایی", "لوازم خانگی", "مصالح ساختمانی", "قطعات یدکی"];
@@ -86,7 +90,7 @@ export function CreateLoadForm({ onBack, onSubmit, isEdit = false, initialData =
             receiver: isReceiverMyself ? 'self' : { firstName: receiverFirstName, lastName: receiverLastName, phone: receiverPhone },
         };
 
-        await new Promise(resolve => setTimeout(resolve, 1500)); // شبیه‌سازی API
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
         onSubmit(loadData);
         setIsLoading(false);
@@ -136,7 +140,7 @@ export function CreateLoadForm({ onBack, onSubmit, isEdit = false, initialData =
                             </Select>
                             <Select value={originCity} onValueChange={setOriginCity} disabled={!originProvince}>
                                 <SelectTrigger><SelectValue placeholder="شهر مبدا" /></SelectTrigger>
-                                <SelectContent>{citiesByProvince[originProvince]?.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                                <SelectContent>{(citiesByProvince[originProvince] || []).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                             </Select>
                         </div>
                         <FloatingTextarea value={originAddress} onChange={e => setOriginAddress(e.target.value)} label="آدرس کامل مبدا" />
@@ -147,7 +151,7 @@ export function CreateLoadForm({ onBack, onSubmit, isEdit = false, initialData =
                             </Select>
                             <Select value={destinationCity} onValueChange={setDestinationCity} disabled={!destinationProvince}>
                                 <SelectTrigger><SelectValue placeholder="شهر مقصد" /></SelectTrigger>
-                                <SelectContent>{citiesByProvince[destinationProvince]?.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                                <SelectContent>{(citiesByProvince[destinationProvince] || []).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                             </Select>
                         </div>
                         <FloatingTextarea value={destinationAddress} onChange={e => setDestinationAddress(e.target.value)} label="آدرس کامل مقصد" />
@@ -181,3 +185,4 @@ export function CreateLoadForm({ onBack, onSubmit, isEdit = false, initialData =
         </div>
     );
 }
+// end of src/features/loads/CreateLoadForm.tsx```

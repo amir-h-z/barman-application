@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUserProfile, updateUserProfile } from '@/api/user';
-import { UserProfile } from '@/types';
+import type { UserProfile } from '@/types';
 import { toast } from 'sonner';
+import type { AxiosError } from 'axios';
 
 // کلید کوئری برای شناسایی داده‌های پروفایل در کش
 const userProfileQueryKey = ['userProfile', 'me'];
@@ -19,7 +20,11 @@ export const useUserProfile = () => {
     });
 
     // Mutation برای به‌روزرسانی پروفایل
-    const { mutate: updateProfile, isPending: isUpdating } = useMutation({
+    const { mutate: updateProfile, isPending: isUpdating } = useMutation<
+        UserProfile,
+        AxiosError<{ message: string }>,
+        Partial<UserProfile>
+    >({
         mutationFn: (updatedData: Partial<UserProfile>) => updateUserProfile(updatedData),
         onSuccess: (updatedProfileData) => {
             // پس از موفقیت، داده‌های کش شده را با اطلاعات جدید به‌روز می‌کنیم

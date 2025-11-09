@@ -6,7 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ArrowRight, Star, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { LoadingDots } from "@/components/shared/LoadingDots";
-import { Trip } from "@/types";
+import type { Trip } from "@/types";
 
 interface TripRatingFormProps {
     trip: Trip;

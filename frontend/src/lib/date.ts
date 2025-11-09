@@ -1,4 +1,4 @@
-import { format as formatJalali, parseISO } from 'date-fns-jalali';
+import { parseISO } from 'date-fns-jalali';
 
 /**
  * یک تاریخ (آبجکت Date یا رشته ISO) را به فرمت شمسی 'yyyy/MM/dd' تبدیل می‌کند.

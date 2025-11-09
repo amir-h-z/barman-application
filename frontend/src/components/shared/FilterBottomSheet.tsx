@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+//import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon, X } from "lucide-react";
 import { format } from "date-fns";
+import type { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { LoadingDots } from "./LoadingDots";
 
+
 interface Filters {
-    dateRange: { from: Date | undefined; to: Date | undefined };
+    dateRange: { from?: Date; to?: Date };
     priceRange: [number, number];
     truckType: string;
     cargoType: string;
@@ -122,9 +124,13 @@ export function FilterBottomSheet({ isOpen, onClose, filters, onFiltersChange }:
                                 <PopoverContent className="w-auto p-0 z-[60]" side="top" align="center">
                                     <Calendar
                                         mode="range"
-                                        selected={tempFilters.dateRange}
-                                        onSelect={(range) => {
-                                            setTempFilters((prev) => ({ ...prev, dateRange: range || { from: undefined, to: undefined } }));
+                                        selected={
+                                            tempFilters.dateRange.from
+                                                ? (tempFilters.dateRange as DateRange)
+                                                : undefined
+                                        }
+                                        onSelect={(range: DateRange | undefined) => {
+                                            setTempFilters((prev) => ({ ...prev, dateRange: range || {} }));
                                             if (range?.from && range?.to) {
                                                 setShowDateCalendar(false);
                                             }

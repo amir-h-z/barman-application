@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getAvailableLoads } from '@/api/loads';
-import { Load, LoadFilters } from '@/types';
+import type { Load } from '@/types';
+import type { LoadFilters } from '@/types';
 
 // کلید کوئری اصلی برای بارهای موجود
 const availableLoadsQueryKey = 'availableLoads';
@@ -9,7 +10,7 @@ const availableLoadsQueryKey = 'availableLoads';
  * هوک سفارشی برای دریافت لیست بارهای موجود با قابلیت فیلتر
  * @param {Partial<LoadFilters>} filters - آبجکت فیلترها
  */
-export const useLoads = (filters: Partial<LoadFilters>) => {
+export const useLoads = (filters: LoadFilters) => {
     const {
         data: loads,
         isLoading,

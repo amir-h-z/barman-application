@@ -2,15 +2,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FloatingInput } from "@/components/ui/floating-input";
-import { FloatingTextarea } from "@/components/ui/floating-textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { User, Edit3, Upload, CalendarIcon, Truck, MapPin, CreditCard, Check, Users, X, Plus } from "lucide-react";
+import { User, Edit3, CreditCard, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { LoadingDots } from "@/components/shared/LoadingDots";
-import { UserProfile } from "@/types";
+import type { UserProfile } from "@/types";
 
 interface UserAccountSectionProps {
     userRole: 'driver' | 'cargo-owner' | 'transport-company';
@@ -20,22 +16,13 @@ interface UserAccountSectionProps {
     onBack: () => void;
 }
 
-const formatDate = (date: Date) => date.toLocaleDateString('fa-IR-u-nu-latn').replace(/\//g, '/');
-const convertPersianToEnglish = (str: string) => str.replace(/[۰-۹]/g, w => '۰۱۲۳۴۵۶۷۸۹'.indexOf(w).toString());
+const convertPersianToEnglish = (str: string) => str ? str.replace(/[۰-۹]/g, w => '۰۱۲۳۴۵۶۷۸۹'.indexOf(w).toString()) : '';
 
 export function UserAccountSection({ userRole, profileData, onProfileUpdate, identifier, onBack }: UserAccountSectionProps) {
     const [formData, setFormData] = useState(profileData);
     const [editingSection, setEditingSection] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // States specific to driver
-    const [licenseDate, setLicenseDate] = useState<Date | undefined>(profileData.licenseExpiry ? new Date(profileData.licenseExpiry) : undefined);
-    const [licenseIssueDate, setLicenseIssueDate] = useState<Date | undefined>(profileData.licenseIssueDate ? new Date(profileData.licenseIssueDate) : undefined);
-    const [smartCardIssueDate, setSmartCardIssueDate] = useState<Date | undefined>(profileData.smartCardIssueDate ? new Date(profileData.smartCardIssueDate) : undefined);
-    const [patoghDrivers, setPatoghDrivers] = useState(profileData.patoghDrivers || []);
-    const [newDriverCode, setNewDriverCode] = useState('');
-    const [isAddingDriver, setIsAddingDriver] = useState(false);
-    const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         setFormData(profileData);
@@ -54,7 +41,7 @@ export function UserAccountSection({ userRole, profileData, onProfileUpdate, ide
         if (!/[0-9۰-۹]/.test(e.key) && e.key.length === 1) e.preventDefault();
     };
 
-    const handleSave = async (section: string) => {
+    const handleSave = async () => {
         setIsLoading(true);
         await new Promise(resolve => setTimeout(resolve, 1000));
         onProfileUpdate(formData);
@@ -63,7 +50,7 @@ export function UserAccountSection({ userRole, profileData, onProfileUpdate, ide
         setIsLoading(false);
     };
 
-    const handleCancel = (section: string) => {
+    const handleCancel = () => {
         setFormData(profileData);
         setEditingSection(null);
     };
@@ -94,7 +81,7 @@ export function UserAccountSection({ userRole, profileData, onProfileUpdate, ide
                                 <div className="grid grid-cols-2 gap-4"><FloatingInput label="نام" value={formData.firstName || ''} onChange={e => handleInputChange('firstName', e.target.value)} onKeyDown={handlePersianOnlyInput} /><FloatingInput label="نام خانوادگی" value={formData.lastName || ''} onChange={e => handleInputChange('lastName', e.target.value)} onKeyDown={handlePersianOnlyInput} /></div>
                                 <FloatingInput label="کد ملی" value={formData.nationalId || ''} onChange={e => handleInputChange('nationalId', e.target.value)} maxLength={10} onKeyDown={handleNumberOnlyInput} />
                                 <Input value={identifier} disabled className="bg-muted"/>
-                                <div className="flex gap-3 pt-4"><Button variant="outline" onClick={() => handleCancel('personal')} className="flex-1">لغو</Button><Button onClick={() => handleSave('personal')} className="flex-1">{isLoading ? <LoadingDots/> : 'ذخیره'}</Button></div>
+                                <div className="flex gap-3 pt-4"><Button variant="outline" onClick={() => handleCancel()} className="flex-1">لغو</Button><Button onClick={() => handleSave()} className="flex-1">{isLoading ? <LoadingDots/> : 'ذخیره'}</Button></div>
                             </>
                         ) : (
                             <div className="space-y-4">{renderFieldRow({ title: 'نام', value: formData.firstName }, { title: 'نام خانوادگی', value: formData.lastName })}{renderFieldRow({ title: 'کد ملی', value: formData.nationalId }, { title: userRole === 'transport-company' ? 'ایمیل' : 'شماره تلفن', value: identifier })}</div>
@@ -102,19 +89,16 @@ export function UserAccountSection({ userRole, profileData, onProfileUpdate, ide
                     </CardContent>
                 </Card>
 
-                {/* ... (Address Card, exactly as in original) ... */}
-                {/* The code for Address card is omitted for brevity but should be copied from the original file as it's identical */}
-
-                {/* Driver-Specific Sections */}
                 {userRole === 'driver' && (
                     <>
-                        {/* License Card */}
                         <Card>
                             <CardHeader><div className="flex items-center justify-between"><CardTitle className="flex items-center gap-2"><CreditCard className="w-5 h-5"/>اطلاعات گواهینامه</CardTitle>{editingSection !== 'license' && <button className="text-blue-600 text-sm" onClick={() => setEditingSection('license')}>ویرایش</button>}</div></CardHeader>
                             <CardContent className="space-y-4">
                                 {editingSection === 'license' ? (
                                     <>
                                         {/* Form fields for license */}
+                                        <div className="text-center text-muted-foreground p-4">فرم ویرایش گواهینامه در اینجا قرار می‌گیرد.</div>
+                                        <div className="flex gap-3 pt-4"><Button variant="outline" onClick={() => handleCancel()} className="flex-1">لغو</Button><Button onClick={() => handleSave()} className="flex-1">{isLoading ? <LoadingDots/> : 'ذخیره'}</Button></div>
                                     </>
                                 ) : (
                                     <div className="space-y-4">
@@ -124,8 +108,6 @@ export function UserAccountSection({ userRole, profileData, onProfileUpdate, ide
                                 )}
                             </CardContent>
                         </Card>
-
-                        {/* Other driver-specific cards like Smart Card, Vehicle, Patogh... */}
                     </>
                 )}
             </div>

@@ -1,18 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Phone, AlertTriangle, Navigation, Play, Pause, X, Building2, User, Headphones, Check } from "lucide-react";
-import { toast } from "sonner";
+import { Phone, AlertTriangle, Navigation, Play, Pause, X, Check } from "lucide-react";
 import { LoadingDots } from "@/components/shared/LoadingDots";
 import { RouteMap } from "@/components/shared/RouteMap";
-import { Trip } from "@/types";
+import type { Trip } from "@/types";
 
-// TODO: این داده موقت باید از طریق هوک useTripDetails جایگزین شود
-import { MOCK_SINGLE_TRIP } from "@/api/mock-data";
+const MOCK_SINGLE_TRIP: Trip = {
+    id: 't1', cargoType: 'میلگرد', price: 30000000, origin: 'اصفهان', destination: 'مشهد', weight: 24, truckType: 'تریلی کفی', date: '1403/09/18', status: 'ongoing', progress: 65, cargoOwnerName: 'فولاد مبارکه',
+    originCoords: { lat: 32.6539, lng: 51.6660 }, destinationCoords: { lat: 36.2605, lng: 59.6168 },
+    billOfLadingNumber: '123456789', loadingCode: '45821', receiverName: 'شرکت ساختمانی آرمان', receiverPhone: '09151234567',
+    destinationAddress: 'مشهد، شهرک صنعتی توس، فاز ۲'
+};
 
 interface TripDetailsProps {
     tripId: string;
@@ -22,25 +22,20 @@ interface TripDetailsProps {
 
 type TripStage = 'bill-of-lading' | 'loading' | 'in-transit' | 'delivery';
 
-export function TripDetails({ tripId, onBack, onTripCompleted }: TripDetailsProps) {
-    // TODO: const { data: trip, isLoading: isTripLoading } = useTripDetails(tripId);
+export function TripDetails({ tripId: _tripId, onBack, onTripCompleted }: TripDetailsProps) {
     const trip = MOCK_SINGLE_TRIP;
 
     const [currentStage, setCurrentStage] = useState<TripStage>('bill-of-lading');
     const [isResting, setIsResting] = useState(false);
     const [showContactDialog, setShowContactDialog] = useState(false);
     const [showProblemDialog, setShowProblemDialog] = useState(false);
-
-    const [deliveryCode, setDeliveryCode] = useState(['', '', '', '', '']);
+    const [deliveryCode, setDeliveryCode] = useState<string[]>(Array(5).fill(''));
     const deliveryInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleStageChange = async (nextStage: TripStage) => {
         setIsSubmitting(true);
-        // TODO: const { mutateAsync: updateStatus } = useUpdateTripStatus();
-        // await updateStatus({ tripId, status: nextStage });
-        await new Promise(resolve => setTimeout(resolve, 1200)); // شبیه‌سازی API
+        await new Promise(resolve => setTimeout(resolve, 1200));
         setCurrentStage(nextStage);
         setIsSubmitting(false);
     };
@@ -129,12 +124,12 @@ export function TripDetails({ tripId, onBack, onTripCompleted }: TripDetailsProp
                                     <h4 className="font-medium">اطلاعات تحویل گیرنده</h4>
                                     <div className="text-sm text-muted-foreground">نام: {trip.receiverName}</div>
                                     <div className="text-sm text-muted-foreground">شماره: {trip.receiverPhone}</div>
-                                    <div className="text-sm text-muted-foreground">آدرس: {trip.receiverAddress}</div>
+                                    <div className="text-sm text-muted-foreground">آدرس: {trip.destinationAddress}</div>
                                 </div>
                                 <div className="space-y-4">
                                     <label className="text-sm font-medium block text-center">کد تحویل را از تحویل گیرنده دریافت کنید:</label>
                                     <div className="flex justify-center gap-3" dir="ltr">
-                                        {[0, 1, 2, 3, 4].map(i => <input key={i} ref={el => deliveryInputRefs.current[i] = el} type="text" inputMode="numeric" maxLength={1} value={deliveryCode[i]} onChange={e => handleDeliveryCodeChange(i, e.target.value)} onKeyDown={e => handleDeliveryCodeKeyDown(i, e)} className="w-12 h-14 text-center text-xl font-bold bg-muted rounded-md border focus:border-primary" />)}
+                                        {[0, 1, 2, 3, 4].map(i => <input key={i} ref={(el) => { deliveryInputRefs.current[i] = el; }} type="text" inputMode="numeric" maxLength={1} value={deliveryCode[i]} onChange={e => handleDeliveryCodeChange(i, e.target.value)} onKeyDown={e => handleDeliveryCodeKeyDown(i, e)} className="w-12 h-14 text-center text-xl font-bold bg-muted rounded-md border focus:border-primary" />)}
                                     </div>
                                 </div>
                                 <Button className="w-full h-12" onClick={handleDeliveryComplete} disabled={!deliveryCode.every(d => d) || isSubmitting}>
@@ -170,9 +165,18 @@ export function TripDetails({ tripId, onBack, onTripCompleted }: TripDetailsProp
             </div>
             <div className="h-full overflow-y-auto p-4 pt-36">{renderStageContent()}</div>
 
-            {/* Dialogs for Contact and Problem */}
-            <Dialog open={showContactDialog} onOpenChange={setShowContactDialog}><DialogContent><DialogHeader><DialogTitle>تماس</DialogTitle></DialogHeader>...</DialogContent></Dialog>
-            <Dialog open={showProblemDialog} onOpenChange={setShowProblemDialog}><DialogContent><DialogHeader><DialogTitle>گزارش مشکل</DialogTitle></DialogHeader>...</DialogContent></Dialog>
+            <Dialog open={showContactDialog} onOpenChange={setShowContactDialog}>
+                <DialogContent>
+                    <DialogHeader><DialogTitle>تماس</DialogTitle></DialogHeader>
+                    <p className="text-center py-4">گزینه‌های تماس در اینجا قرار می‌گیرند.</p>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={showProblemDialog} onOpenChange={setShowProblemDialog}>
+                <DialogContent>
+                    <DialogHeader><DialogTitle>گزارش مشکل</DialogTitle></DialogHeader>
+                    <p className="text-center py-4">فرم گزارش مشکل در اینجا قرار می‌گیرد.</p>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

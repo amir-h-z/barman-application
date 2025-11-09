@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom'; // فرض بر استفاده از React Router
+import { useNavigate } from 'react-router-dom';
 import { loginRequest, verifyOtp } from '@/api/auth';
 import { useAuth as useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import type { AxiosError } from 'axios';
+import type { User } from '@/types';
 
 export const useAuth = () => {
     const queryClient = useQueryClient();
@@ -10,9 +12,13 @@ export const useAuth = () => {
     const { login, logout: contextLogout, user, isAuthenticated, isLoading } = useAuthContext();
 
     // Mutation برای درخواست ارسال کد تایید
-    const { mutate: sendLoginRequest, isPending: isSendingOtp } = useMutation({
-        mutationFn: ({ identifier, role }: { identifier: string; role: string }) => loginRequest(identifier, role),
-        onSuccess: (data, variables) => {
+    const { mutate: sendLoginRequest, isPending: isSendingOtp } = useMutation<
+        { message: string },
+        AxiosError<{ message: string }>,
+        { identifier: string; role: string }
+    >({
+        mutationFn: ({ identifier, role }) => loginRequest(identifier, role),
+        onSuccess: (data, _variables) => {
             toast.success(data.message || 'کد تایید ارسال شد.');
             // می‌توانید کاربر را به صفحه ورود کد هدایت کنید
             // navigate('/verify-otp', { state: { identifier: variables.identifier } });
@@ -23,8 +29,12 @@ export const useAuth = () => {
     });
 
     // Mutation برای تایید کد و ورود نهایی
-    const { mutate: verifyLogin, isPending: isVerifyingOtp } = useMutation({
-        mutationFn: ({ identifier, otp }: { identifier: string; otp: string }) => verifyOtp(identifier, otp),
+    const { mutate: verifyLogin, isPending: isVerifyingOtp } = useMutation<
+        { user: User; token: string },
+        AxiosError<{ message: string }>,
+        { identifier: string; otp: string }
+    >({
+        mutationFn: ({ identifier, otp }) => verifyOtp(identifier, otp),
         onSuccess: (data) => {
             // استفاده از تابع login از AuthContext برای ذخیره توکن و اطلاعات کاربر
             login(data.token, data.user);
@@ -59,3 +69,4 @@ export const useAuth = () => {
         logout,
     };
 };
+// end of src/hooks/useAuth.ts

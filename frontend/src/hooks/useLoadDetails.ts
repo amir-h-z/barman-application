@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getLoadDetails } from '@/api/loads';
-import { Load } from '@/types';
+import type { Load } from '@/types';
 
 // کلید کوئری اصلی برای جزئیات بارها
 const loadDetailsQueryKey = 'loadDetails';

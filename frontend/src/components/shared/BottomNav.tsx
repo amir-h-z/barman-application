@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
-import { LucideIcon } from "lucide-react";
+import { motion } from "framer-motion";
+import type { LucideIcon } from "lucide-react";
 
 interface TabItem {
     id: string;

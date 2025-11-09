@@ -1,5 +1,5 @@
 import apiClient from './index';
-import { UserProfile } from '@/types';
+import type { UserProfile } from '@/types';
 
 export const getUserProfile = async (): Promise<UserProfile> => {
     try {

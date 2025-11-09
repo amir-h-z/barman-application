@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FilterBottomSheet } from "@/components/shared/FilterBottomSheet";
-import { TripDetails } from "./TripDetails";
+// import { FilterBottomSheet } from "@/components/shared/FilterBottomSheet";
 import { DriverCompletedTripCard } from "./DriverCompletedTripCard";
 import { DriverInProgressCard } from "./DriverInProgressCard";
 import { DriverRequestsLoadCard } from "./DriverRequestsLoadCard";
@@ -10,27 +9,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Filter } from "lucide-react";
 import { toast } from "sonner";
-import { Trip, Load, TripFilters } from "@/types"; // تایپ‌ها را از فایل مرکزی import کنید
-
-// TODO: این داده‌های موقت باید با فراخوانی هوک‌های useTrips و useRequests جایگزین شوند
+import type { Trip, Load } from "@/types";
+// import type { TripFilters } from "@/types/api";
 import { MOCK_ONGOING_TRIPS, MOCK_COMPLETED_TRIPS, MOCK_REQUEST_LOADS, MOCK_REJECTED_LOADS } from "@/api/mock-data";
 
 interface TripsListProps {
-    onTripSelected: (tripId: string) => void; // برای ناوبری به صفحه جزئیات
+    onTripSelected: (tripId: string) => void;
 }
 
 export function TripsList({ onTripSelected }: TripsListProps) {
-    const [filters, setFilters] = useState<TripFilters>({ /* ... initial filters */ });
-    const [showFilterSheet, setShowFilterSheet] = useState(false);
+    // const [filters, setFilters] = useState<Partial<TripFilters>>({});
+    // const [showFilterSheet, setShowFilterSheet] = useState(false);
     const [activeTab, setActiveTab] = useState('ongoing');
     const [showCancelDialog, setShowCancelDialog] = useState(false);
     const [loadToCancel, setLoadToCancel] = useState<string | null>(null);
 
-    // TODO: این state ها باید با داده‌های واقعی از هوک‌ها پر شوند
-    const [ongoingTrips, setOngoingTrips] = useState<Trip[]>(MOCK_ONGOING_TRIPS);
-    const [completedTrips, setCompletedTrips] = useState<Trip[]>(MOCK_COMPLETED_TRIPS);
+    const [ongoingTrips, _setOngoingTrips] = useState<Trip[]>(MOCK_ONGOING_TRIPS);
+    const [completedTrips, _setCompletedTrips] = useState<Trip[]>(MOCK_COMPLETED_TRIPS);
     const [requestLoads, setRequestLoads] = useState<Load[]>(MOCK_REQUEST_LOADS);
-    const [rejectedLoads, setRejectedLoads] = useState<Load[]>(MOCK_REJECTED_LOADS);
+    const [rejectedLoads, _setRejectedLoads] = useState<Load[]>(MOCK_REJECTED_LOADS);
 
     const handleCancelRequest = (loadId: string) => {
         setLoadToCancel(loadId);
@@ -48,18 +45,16 @@ export function TripsList({ onTripSelected }: TripsListProps) {
 
     return (
         <div className="flex flex-col h-screen bg-background">
-            {/* هدر ثابت */}
             <div className="bg-white fixed top-0 left-0 right-0 z-10 border-b">
                 <div className="px-4 py-3 flex items-center justify-between">
                     <h1 className="text-primary text-base">بارهای من</h1>
-                    <Button variant="outline" size="sm" onClick={() => setShowFilterSheet(true)} className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" /*onClick={() => setShowFilterSheet(true)}*/ disabled className="flex items-center gap-2">
                         <Filter className="w-4 h-4" /> فیلتر
                     </Button>
                 </div>
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col pt-16">
-                {/* لیست تب‌ها */}
                 <div className="px-4 py-2 bg-white fixed top-[61px] left-0 right-0 z-10">
                     <TabsList className="grid w-full grid-cols-4 h-12">
                         <TabsTrigger value="rejected" className="text-sm h-10">رد شده</TabsTrigger>
@@ -69,7 +64,6 @@ export function TripsList({ onTripSelected }: TripsListProps) {
                     </TabsList>
                 </div>
 
-                {/* محتوای تب‌ها */}
                 <div className="flex-1 overflow-y-auto scrollbar-hide pt-16">
                     <TabsContent value="ongoing" className="mt-0">
                         <div className="p-4 space-y-4">

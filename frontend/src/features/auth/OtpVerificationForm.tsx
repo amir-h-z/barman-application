@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import { useState, useEffect, useRef } from "react";
+import type { KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { LoadingDots } from "@/components/shared/LoadingDots";
@@ -122,7 +123,9 @@ export function OtpVerificationForm({ identifier, onVerify, onBack, isLoading }:
                             {[0, 1, 2, 3, 4].map((index) => (
                                 <div key={index} className="flex-1 relative">
                                     <input
-                                        ref={(el) => (inputRefs.current[index] = el)}
+                                        ref={(el) => {
+                                            inputRefs.current[index] = el;
+                                        }}
                                         type="text"
                                         inputMode="numeric"
                                         maxLength={1}

@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { X, Minus, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-import { Driver } from "@/types"; // فرض می‌شود این تایپ در src/types/index.ts تعریف شده
+import type { Driver } from "@/types";
 
 interface CargoRequestPopupProps {
     isOpen: boolean;

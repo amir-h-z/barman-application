@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { CreditCard, CheckCircle2, Plus, Edit3, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { LoadingDots } from "@/components/shared/LoadingDots";
-import { BankAccount } from "@/types";
+import type { BankAccount } from "@/types";
 
 interface BankingSectionProps {
     userRole: 'driver' | 'cargo-owner' | 'transport-company';

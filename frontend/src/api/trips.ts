@@ -1,6 +1,6 @@
 import apiClient from './index';
-import { Trip, TripFilters, TripStatus, RatingPayload } from '@/types';
-
+import type { Trip } from '@/types';
+import type { TripFilters, TripStatus, RatingPayload } from '@/types';
 
 export const getTrips = async (filters: TripFilters): Promise<Trip[]> => {
     try {

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle, MessageCircle, Phone, ArrowLeft, ArrowRight } from "lucide-react";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
 interface HelpSupportSectionProps {
     userRole: 'driver' | 'cargo-owner' | 'transport-company';

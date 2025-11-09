@@ -1,13 +1,14 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Trip } from '@/types'; // تایپ Trip را از فایل مرکزی import کنید
+import type { Trip } from '@/types'; // تایپ Trip را از فایل مرکزی import کنید
 
 interface TripTrackingMapProps {
     trip: Pick<Trip, 'origin' | 'destination' | 'progress' | 'originCoords' | 'destinationCoords'>;
 }
 
 // برای جلوگیری از مشکل آیکون‌های پیش‌فرض در Webpack/Vite
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({

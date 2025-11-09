@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getTripDetails } from '@/api/trips';
-import { Trip } from '@/types';
+import type { Trip } from '@/types';
 
 // کلید کوئری اصلی برای جزئیات سفرها
 const tripDetailsQueryKey = 'tripDetails';

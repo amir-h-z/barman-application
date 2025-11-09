@@ -3,66 +3,54 @@ import { RoleSelection } from '@/features/auth/RoleSelection';
 import { PhoneInputForm } from '@/features/auth/PhoneInputForm';
 import { OtpVerificationForm } from '@/features/auth/OtpVerificationForm';
 import { LoginSuccessAnimation } from '@/features/auth/LoginSuccessAnimation';
-import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth'; // مسیر صحیح است
 
-// در یک اپلیکیشن واقعی، این مسیرها از یک فایل مرکزی خوانده می‌شوند
-const getDashboardPathByRole = (role: string) => {
-    switch (role) {
-        case 'driver': return '/driver/available-loads';
-        case 'cargo-owner': return '/cargo-owner/active-loads';
-        case 'transport-company': return '/transport-company/available-loads';
-        default: return '/';
-    }
-};
+// این تابع دیگر در اینجا لازم نیست، چون منطق ناوبری به داخل هوک useAuth منتقل شده
+// const getDashboardPathByRole = (role: string) => { ... };
 
 type LoginStep = 'role-selection' | 'identifier-input' | 'otp-verification' | 'success-animation';
 
 export function LoginPage() {
     const [step, setStep] = useState<LoginStep>('role-selection');
     const [selectedRole, setSelectedRole] = useState<string>('');
-    const [identifier, setIdentifier] = useState<string>(''); // Can be phone or email
-    const { login } = useAuth(); // هوک احراز هویت
+    const [identifier, setIdentifier] = useState<string>('');
 
-    // شبیه‌سازی هوک‌های useMutation
-    const [isSendingOtp, setIsSendingOtp] = useState(false);
-    const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+    const { sendLoginRequest, isSendingOtp, verifyLogin, isVerifyingOtp } = useAuth();
 
     const handleRoleSelect = (role: string) => {
         setSelectedRole(role);
         setStep('identifier-input');
     };
 
-    const handleIdentifierSubmit = async (value: string) => {
-        setIsSendingOtp(true);
-        // TODO: Replace with actual API call from useAuth hook
-        // sendLoginRequest({ identifier: value, role: selectedRole });
-        await new Promise(resolve => setTimeout(resolve, 1500));
+    const handleIdentifierSubmit = (value: string) => {
         setIdentifier(value);
-        toast.success(`کد تایید به ${value} ارسال شد.`);
-        setIsSendingOtp(false);
-        setStep('otp-verification');
+        sendLoginRequest(
+            { identifier: value, role: selectedRole },
+            {
+                onSuccess: () => {
+                    setStep('otp-verification');
+                }
+            }
+        );
     };
 
-    const handleOtpVerify = async (otp: string) => {
-        setIsVerifyingOtp(true);
-        // TODO: Replace with actual API call from useAuth hook
-        // verifyLogin({ identifier, otp });
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // داده‌های کاربر و توکن از پاسخ API دریافت می‌شود
-        const mockUser = { id: '1', role: selectedRole, firstName: 'کاربر', lastName: 'جدید' };
-        const mockToken = 'jwt-mock-token';
-
-        login(mockToken, mockUser);
-        setIsVerifyingOtp(false);
-        setStep('success-animation');
+    const handleOtpVerify = (otp: string) => {
+        // منطق ناوبری در onSuccess این هوک به صورت خودکار انجام می‌شود
+        verifyLogin(
+            { identifier, otp },
+            {
+                onSuccess: () => {
+                    // پس از لاگین موفق، انیمیشن را نمایش بده
+                    setStep('success-animation');
+                }
+            }
+        );
     };
 
     const handleAnimationComplete = () => {
-        // در اینجا به جای useNavigate از window.location استفاده می‌کنیم
-        // چون این کامپوننت خارج از روتر اصلی قرار دارد
-        window.location.href = getDashboardPathByRole(selectedRole);
+        // هوک useAuth خودش کاربر را به مسیر صحیح هدایت می‌کند.
+        // اگر می‌خواهید حتما بعد از انیمیشن هدایت شوید، باید منطق navigate را از هوک به اینجا منتقل کنید.
+        // فعلا این تابع را خالی می‌گذاریم چون هوک کار را انجام می‌دهد.
     };
 
     const handleBack = () => {
@@ -79,11 +67,13 @@ export function LoginPage() {
         case 'role-selection':
             return <RoleSelection onRoleSelect={handleRoleSelect} />;
         case 'identifier-input':
-            // TODO: Create a separate EmailInputForm for transport companies
-            return <PhoneInputForm onSubmit={handleIdentifierSubmit} onBack={handleBack} />;
+            // TODO: Create a separate EmailInputForm
+            return <PhoneInputForm onSubmit={handleIdentifierSubmit} onBack={handleBack} isLoading={isSendingOtp} />;
         case 'otp-verification':
             return <OtpVerificationForm identifier={identifier} onVerify={handleOtpVerify} onBack={handleBack} isLoading={isVerifyingOtp} />;
         case 'success-animation':
+            // توجه: هوک useAuth ممکن است قبل از اتمام انیمیشن کاربر را هدایت کند.
+            // برای کنترل بهتر، باید navigate را از هوک useAuth حذف کرده و در onComplete اینجا قرار دهید.
             return <LoginSuccessAnimation isVisible={true} onComplete={handleAnimationComplete} />;
         default:
             return <RoleSelection onRoleSelect={handleRoleSelect} />;

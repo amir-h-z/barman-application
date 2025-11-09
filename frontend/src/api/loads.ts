@@ -1,5 +1,6 @@
 import apiClient from './index';
-import { Load, LoadFilters, NewLoadData } from '@/types';
+import type { Load } from '@/types';
+import type { LoadFilters, NewLoadData } from '@/types';
 
 
 export const getAvailableLoads = async (filters: LoadFilters): Promise<Load[]> => {

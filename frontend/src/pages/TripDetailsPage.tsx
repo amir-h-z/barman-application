@@ -1,42 +1,39 @@
+// start of src/pages/TripDetailsPage.tsx
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { TripDetails } from '@/features/trips/TripDetails';
-import { TripRatingForm } from '@/features/trips/TripRatingForm'; // کامپوننت فرم امتیازدهی
 import { useTripDetails } from '@/hooks/useTripDetails';
 import { useAuth } from '@/contexts/AuthContext';
+import { TripDetails } from '@/features/trips/TripDetails';
+import { TripRatingForm } from '@/features/trips/TripRatingForm';
 import { LoadingDots } from '@/components/shared/LoadingDots';
-import { Trip } from '@/types';
-import { useState } from 'react';
-
-type TripView = 'details' | 'rating';
+import type { Trip } from '@/types';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 export function TripDetailsPage() {
     const { tripId } = useParams<{ tripId: string }>();
     const navigate = useNavigate();
     const { user } = useAuth();
-    const [view, setView] = useState<TripView>('details');
+    const { trip, isLoading } = useTripDetails(tripId || null);
 
-    // واکشی داده‌های سفر با استفاده از هوک
-    const { trip, isLoading, isError } = useTripDetails(tripId || null);
+    const [showRatingForm, setShowRatingForm] = useState(false);
+    // const [completedTrip, setCompletedTrip] = useState<Trip | null>(null);
 
     const handleBack = () => {
-        if (user?.role) {
-            navigate(`/${user.role}/trips`);
-        } else {
-            navigate('/');
-        }
+        navigate(-1); // بازگشت به صفحه قبل
     };
 
-    const handleTripCompleted = (completedTrip: Trip) => {
-        // تغییر نما به فرم امتیازدهی
-        setView('rating');
+    const handleTripCompleted = (tripData: Trip) => {
+        toast.success(`سفر ${tripData.cargoType} با موفقیت به پایان رسید.`);
+        setShowRatingForm(true);
     };
 
     const handleRatingComplete = () => {
-        // پس از ثبت امتیاز، کاربر به صفحه اصلی داشبورد هدایت می‌شود
+        toast.info("از بازخورد شما سپاسگزاریم.");
+        setShowRatingForm(false);
+        // هدایت کاربر به صفحه اصلی سفرها پس از ثبت امتیاز
         if (user?.role) {
-            navigate(`/${user.role}/available-loads`, { state: { showPaymentAlert: true, amount: trip?.price } });
-        } else {
-            navigate('/');
+            navigate(`/${user.role}/trips`);
         }
     };
 
@@ -48,25 +45,29 @@ export function TripDetailsPage() {
         );
     }
 
-    if (isError || !trip) {
+    if (!trip || !user) {
         return (
-            <div className="flex flex-col items-center justify-center h-screen text-center">
-                <h2 className="text-xl font-semibold text-destructive">خطا</h2>
-                <p className="text-muted-foreground">اطلاعات این سفر یافت نشد.</p>
-                <Button onClick={handleBack} variant="outline" className="mt-4">
-                    بازگشت به لیست سفرها
-                </Button>
+            <div className="flex flex-col items-center justify-center h-screen gap-4">
+                <p>سفر مورد نظر یافت نشد.</p>
+                <Button onClick={handleBack}>بازگشت</Button>
             </div>
         );
     }
 
-    if (view === 'rating') {
+    if (showRatingForm) {
+        if (user.role !== 'driver' && user.role !== 'cargo-owner') {
+            toast.error("نقش شما برای امتیازدهی معتبر نیست.");
+            // به صورت خودکار به صفحه قبل برمی‌گردیم
+            navigate(-1);
+            return null; // چیزی رندر نکن
+        }
+
         return (
             <TripRatingForm
                 trip={trip}
-                userRole={user!.role} // در این مرحله کاربر قطعا وجود دارد
+                userRole={user.role} // اکنون این پراپرتی type-safe است
                 onComplete={handleRatingComplete}
-                onBack={() => setView('details')} // امکان بازگشت به جزئیات
+                onBack={() => setShowRatingForm(false)}
             />
         );
     }

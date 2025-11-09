@@ -1,5 +1,6 @@
 import apiClient from './index';
-import { WalletBalance, Transaction, TransactionFilters } from '@/types';
+import type { WalletBalance, Transaction } from '@/types';
+import type { TransactionFilters } from '@/types';
 
 
 export const getWalletBalance = async (): Promise<WalletBalance> => {

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import App from './App';
-import './styles/globals.css'; // مسیر فایل استایل‌های عمومی
+import './styles/global.css'; // مسیر فایل استایل‌های عمومی
 
 // یک نمونه از Query Client برای مدیریت کش داده‌ها
 const queryClient = new QueryClient({

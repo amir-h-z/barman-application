@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
-import { UserRole } from "@/types"; // فرض می‌شود این تایپ تعریف شده است
+import type { UserRole } from "@/types";
 
 interface IncompleteProfileWarningProps {
     userRole: UserRole;

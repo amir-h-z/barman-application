@@ -8,9 +8,8 @@ interface RouteMapProps {
     progress: number; // A number between 0 and 100
 }
 
-// برای جلوگیری از مشکل آیکون‌های پیش‌فرض در Webpack/Vite
-// @ts-ignore
-delete L.Icon.Default.prototype._getIconUrl;
+
+// delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
     iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',

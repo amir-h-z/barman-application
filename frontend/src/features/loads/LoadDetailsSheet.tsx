@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Copy, Share2, X } from "lucide-react";
 import { toast } from "sonner";
-import { Load } from "@/types";
+import type { Load } from "@/types";
 
 interface LoadDetailsSheetProps {
     load: Load | null;
@@ -109,13 +109,15 @@ export function LoadDetailsSheet({
                             <div className="text-right">
                                 <span className="text-sm text-muted-foreground block mb-2">مبدا</span>
                                 <p className="font-medium leading-relaxed">
-                                    {[load.originProvince, load.originCity, load.originSquare, load.originStreet, load.originAlley].filter(Boolean).join('، ')}
+                                    {/*{[load.originProvince, load.originCity, load.originSquare, load.originStreet, load.originAlley].filter(Boolean).join('، ')}*/}
+                                    {load.originAddress || `${load.originProvince}، ${load.origin}`}
                                 </p>
                             </div>
                             <div className="text-right">
                                 <span className="text-sm text-muted-foreground block mb-2">مقصد</span>
                                 <p className="font-medium leading-relaxed">
-                                    {[load.destinationProvince, load.destinationCity, load.destinationSquare, load.destinationStreet, load.destinationAlley].filter(Boolean).join('، ')}
+                                    {/*{[load.destinationProvince, load.destinationCity, load.destinationSquare, load.destinationStreet, load.destinationAlley].filter(Boolean).join('، ')}*/}
+                                    {load.destinationAddress || `${load.destinationProvince}، ${load.destination}`}
                                 </p>
                             </div>
 

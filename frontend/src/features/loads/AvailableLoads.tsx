@@ -3,21 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Filter, List, Map } from "lucide-react";
 import { FilterBottomSheet } from "@/components/shared/FilterBottomSheet";
 import { ShareBottomSheet } from "@/components/shared/ShareBottomSheet";
-import { CargoRequestPopup } from "@/features/loads/CargoRequestPopup"; // این کامپوننت هنوز ساخته نشده
+import { CargoRequestPopup } from "@/features/loads/CargoRequestPopup";
 import { LoadCard } from "./LoadCard";
 import { LoadDetailsSheet } from "./LoadDetailsSheet";
-import { Load, LoadFilters } from "@/types";
+import type { Load } from "@/types";
+import type { LoadFilters } from "@/types";
 import { toast } from "sonner";
 import L from 'leaflet';
+import { MOCK_LOADS } from '@/api/mock-data';
 
-// TODO: این داده‌های موقت باید با فراخوانی هوک useLoads جایگزین شوند
-import { MOCK_LOADS } from '@/api/mock-data'; // داده‌های موقت را به یک فایل جدا منتقل کنید
-
-interface AvailableLoadsProps {
-    // Props for payment alert, etc. can be added here
-}
-
-export function AvailableLoads({}: AvailableLoadsProps) {
+export function AvailableLoads() {
     const [filters, setFilters] = useState<LoadFilters>({
         dateRange: { from: undefined, to: undefined },
         priceRange: [0, 100000000],
@@ -36,28 +31,27 @@ export function AvailableLoads({}: AvailableLoadsProps) {
     const mapRef = useRef<L.Map | null>(null);
     const markersRef = useRef<L.Marker[]>([]);
 
-    // TODO: این بخش با هوک useLoads جایگزین خواهد شد
-    // const { data: loads, isLoading } = useLoads(filters);
     const loads = MOCK_LOADS;
 
-    const filteredLoads = loads.filter(load => {
-        // منطق فیلتر کردن همانند نسخه اصلی
-        // ...
+    const filteredLoads = loads.filter(_load => {
         return true;
     });
 
-    // توابع مدیریت باز و بسته شدن شیت‌ها و پاپ‌آپ‌ها
     const handleCardClick = (load: Load) => setSelectedLoad(load);
     const handleCloseDetails = () => setSelectedLoad(null);
 
     const handleRequestCargo = (load: Load) => {
-        setSelectedLoad(null); // بستن شیت جزئیات
-        setTimeout(() => setShowCargoRequestPopup(true), 300); // باز کردن پاپ‌آپ با تاخیر برای انیمیشن بهتر
+        setSelectedLoad(null);
+        setTimeout(() => {
+            // TODO: باید اطلاعات ظرفیت باقیمانده بار را از API بگیریم
+            setSelectedLoad(load);
+            setShowCargoRequestPopup(true);
+        }, 300);
     };
 
     const handleShare = (load: Load) => {
-        setSelectedLoad(null); // بستن شیت جزئیات
-        setTimeout(() => setShowShareSheet(true), 300);
+        setSelectedLoad(load); // برای پاس دادن به شیت اشتراک‌گذاری
+        setShowShareSheet(true);
     };
 
     const handleCargoRequestSubmit = () => {
@@ -65,13 +59,12 @@ export function AvailableLoads({}: AvailableLoadsProps) {
         toast.success("درخواست شما با موفقیت ثبت شد");
     };
 
-    // افکت برای مدیریت نقشه
     useEffect(() => {
         if (viewMode === 'map') {
             const mapContainer = document.getElementById('map');
             if (!mapContainer || mapRef.current) return;
 
-            const map = L.map('map').setView([32.4279, 53.6880], 6); // مرکز ایران
+            const map = L.map('map').setView([32.4279, 53.6880], 6);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             mapRef.current = map;
         } else {
@@ -82,14 +75,11 @@ export function AvailableLoads({}: AvailableLoadsProps) {
         }
     }, [viewMode]);
 
-    // افکت برای به‌روزرسانی مارکرها روی نقشه
     useEffect(() => {
         if (viewMode === 'map' && mapRef.current) {
-            // پاک کردن مارکرهای قدیمی
             markersRef.current.forEach(marker => marker.remove());
             markersRef.current = [];
 
-            // افزودن مارکرهای جدید برای بارهای فیلتر شده
             filteredLoads.forEach(load => {
                 const customIcon = L.divIcon({
                     className: 'custom-div-icon',
@@ -107,7 +97,6 @@ export function AvailableLoads({}: AvailableLoadsProps) {
 
     return (
         <div className="flex flex-col h-screen">
-            {/* هدر ثابت با دکمه‌های فیلتر و تغییر نما */}
             <div className="bg-white border-b border-border px-4 py-3 fixed top-0 left-0 right-0 z-10">
                 <div className="flex items-center justify-between gap-3">
                     <div className="relative flex bg-muted rounded-lg p-1 w-40">
@@ -134,11 +123,10 @@ export function AvailableLoads({}: AvailableLoadsProps) {
                 )}
             </div>
 
-            {/* تمام شیت‌ها و پاپ‌آپ‌ها در اینجا رندر می‌شوند */}
             <FilterBottomSheet isOpen={showFilterSheet} onClose={() => setShowFilterSheet(false)} filters={filters} onFiltersChange={setFilters} />
-            <LoadDetailsSheet isOpen={!!selectedLoad} load={selectedLoad} onClose={handleCloseDetails} onRequestCargo={handleRequestCargo} onShare={handleShare} />
-            {/* <ShareBottomSheet isOpen={showShareSheet} onClose={() => setShowShareSheet(false)} loadData={selectedLoad} /> */}
-            {/* <CargoRequestPopup isOpen={showCargoRequestPopup} onClose={() => setShowCargoRequestPopup(false)} onSubmit={handleCargoRequestSubmit} remainingCapacity={5} /> */}
+            <LoadDetailsSheet isOpen={!!selectedLoad && !showShareSheet && !showCargoRequestPopup} load={selectedLoad} onClose={handleCloseDetails} onRequestCargo={handleRequestCargo} onShare={handleShare} />
+            <ShareBottomSheet isOpen={showShareSheet} onClose={() => setShowShareSheet(false)} loadData={selectedLoad} />
+            <CargoRequestPopup isOpen={showCargoRequestPopup} onClose={() => setShowCargoRequestPopup(false)} onSubmit={handleCargoRequestSubmit} remainingCapacity={selectedLoad?.remainingCapacity ?? 1} />
         </div>
     );
 }

@@ -25,7 +25,7 @@ export function ShareBottomSheet({ isOpen, onClose, loadData }: ShareBottomSheet
             setIsLinkCopied(true);
             toast.success('لینک کپی شد');
             setTimeout(() => setIsLinkCopied(false), 3000);
-        } catch (err) {
+        } catch {
             toast.error('کپی کردن لینک با خطا مواجه شد');
         }
     };
@@ -97,7 +97,7 @@ export function ShareBottomSheet({ isOpen, onClose, loadData }: ShareBottomSheet
                             </Button>
                         </div>
 
-                        {navigator.share && (
+                        {"share" in navigator && (
                             <>
                                 <Separator />
                                 <Button

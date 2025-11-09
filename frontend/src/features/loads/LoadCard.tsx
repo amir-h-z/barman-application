@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Truck, MapPin } from "lucide-react";
-import { Load } from "@/types"; // فرض می‌شود تایپ Load در این مسیر است
+import type { Load } from "@/types";
 
 interface LoadCardProps {
     load: Load;

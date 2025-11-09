@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createLoad } from '@/api/loads';
-import { NewLoadData, Load } from '@/types';
+import type { Load } from '@/types';
+import type { NewLoadData } from '@/types';
 import { toast } from 'sonner';
+import type { AxiosError } from 'axios';
 
 /**
  * هوک سفارشی برای ایجاد یک بار جدید
@@ -15,7 +17,11 @@ export const useCreateLoad = () => {
         isSuccess,
         isError,
         error,
-    } = useMutation<Load, Error, NewLoadData>({
+    } = useMutation<
+        Load, // TData: نوع خروجی موفق
+        AxiosError<{ message: string }>, // TError: نوع خطا
+        NewLoadData // TVariables: نوع ورودی
+    >({
         mutationFn: (loadData: NewLoadData) => createLoad(loadData),
 
         onSuccess: (newLoad) => {
@@ -25,16 +31,10 @@ export const useCreateLoad = () => {
             // این کار باعث می‌شود TanStack Query به صورت خودکار لیست بارها را در پس‌زمینه به‌روز کند
             // تا بار جدید در لیست بارهای فعال نمایش داده شود.
             queryClient.invalidateQueries({ queryKey: ['activeLoads'] });
-
-            // همچنین می‌توانیم داده‌های کش شده را به صورت دستی و خوش‌بینانه (optimistically) به‌روز کنیم:
-            // queryClient.setQueryData(['activeLoads'], (oldData: Load[] | undefined) => {
-            //   return oldData ? [newLoad, ...oldData] : [newLoad];
-            // });
         },
 
         onError: (error) => {
-            // نمایش پیام خطا از سرور یا یک پیام عمومی
-            const errorMessage = (error as any).response?.data?.message || 'خطا در ثبت بار جدید';
+            const errorMessage = error.response?.data?.message || 'خطا در ثبت بار جدید';
             toast.error(errorMessage);
         },
     });

@@ -7,25 +7,23 @@ export function MyTripsPage() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    // در یک اپلیکیشن واقعی، این مقدار باید از آبجکت user که از API می‌آید خوانده شود
-    const isProfileComplete = user?.isProfileComplete ?? false;
+    // اگر اطلاعات کاربر هنوز در دسترس نیست، چیزی رندر نکن
+    if (!user) {
+        return null; // یا یک کامپوننت لودینگ
+    }
+
+    const isProfileComplete = user.isProfileComplete;
 
     const handleGoToProfile = () => {
-        if (user?.role) {
-            navigate(`/${user.role}/profile`);
-        }
+        navigate(`/${user.role}/profile`);
     };
 
-    // تابع برای هدایت کاربر به صفحه جزئیات سفر
     const handleTripSelect = (tripId: string) => {
-        if (user?.role) {
-            navigate(`/${user.role}/trips/${tripId}`);
-        }
+        navigate(`/${user.role}/trips/${tripId}`);
     };
 
-    // اگر پروفایل کاربر کامل نباشد، اجازه دسترسی به این صفحه را نمی‌دهیم
     if (!isProfileComplete) {
-        return <IncompleteProfileWarning onGoToProfile={handleGoToProfile} />;
+        return <IncompleteProfileWarning userRole={user.role} onGoToProfile={handleGoToProfile} />;
     }
 
     return (

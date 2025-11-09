@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getTrips } from '@/api/trips';
-import { Trip, TripFilters } from '@/types';
+import type { Trip } from '@/types';
+import type { TripFilters } from '@/types';
 
 // کلید کوئری اصلی برای لیست سفرها
 const tripsQueryKey = 'trips';

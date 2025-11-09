@@ -13,7 +13,7 @@ type ProfileSection = 'main' | 'account' | 'wallet' | 'banking' | 'settings' | '
 
 export function ProfilePage() {
     const { user, logout } = useAuth();
-    const { profile, updateProfile, isLoading, isUpdating } = useUserProfile();
+    const { profile, updateProfile, isLoading } = useUserProfile();
     const [currentSection, setCurrentSection] = useState<ProfileSection>('main');
 
     const handleSectionChange = (section: ProfileSection) => {

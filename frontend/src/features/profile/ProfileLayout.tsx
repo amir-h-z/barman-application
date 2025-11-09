@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
-    User,
+    User as UserIcon,
     Wallet,
     CreditCard,
     Settings,
@@ -11,18 +11,18 @@ import {
     ChevronLeft
 } from "lucide-react";
 import { StarRating } from "@/components/shared/StarRating";
-import { UserProfile } from "@/types"; // فرض می‌شود این تایپ تعریف شده است
+import type { UserProfile } from "@/types";
 
 type ProfileSection = 'account' | 'wallet' | 'banking' | 'settings' | 'help';
 
 interface ProfileLayoutProps {
-    user: User | null;
+    user: UserProfile | null;
     onLogout: () => void;
     onSectionChange: (section: ProfileSection) => void;
 }
 
 export function ProfileLayout({ user, onLogout, onSectionChange }: ProfileLayoutProps) {
-    if (!user) return null; // اگر کاربر لاگین نکرده بود، چیزی نمایش نده
+    if (!user) return null;
 
     const getRoleSpecificId = () => {
         switch (user.role) {
@@ -38,7 +38,7 @@ export function ProfileLayout({ user, onLogout, onSectionChange }: ProfileLayout
     };
 
     const menuItems = [
-        { id: 'account', title: 'حساب کاربری', icon: User, colorClass: 'text-blue-600', bgColorClass: 'bg-blue-100' },
+        { id: 'account', title: 'حساب کاربری', icon: UserIcon, colorClass: 'text-blue-600', bgColorClass: 'bg-blue-100' },
         { id: 'wallet', title: 'کیف پول و تراکنش ها', icon: Wallet, colorClass: 'text-green-600', bgColorClass: 'bg-green-100' },
         { id: 'banking', title: 'اطلاعات بانکی', icon: CreditCard, colorClass: 'text-purple-600', bgColorClass: 'bg-purple-100' },
         { id: 'settings', title: 'تنظیمات', icon: Settings, colorClass: 'text-orange-600', bgColorClass: 'bg-orange-100' },
@@ -48,13 +48,11 @@ export function ProfileLayout({ user, onLogout, onSectionChange }: ProfileLayout
     return (
         <div className="min-h-screen bg-background">
             <div className="pt-6 pb-24 px-4 space-y-4">
-
-                {/* کارت اطلاعات پروفایل */}
                 <Card>
                     <CardContent className="px-6 py-4">
                         <div className="flex items-center gap-4">
                             <div className="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
-                                <User className="w-8 h-8" />
+                                <UserIcon className="w-8 h-8" />
                             </div>
                             <div className="flex-1 space-y-1 text-right">
                                 <div className="font-medium text-lg">
@@ -71,7 +69,6 @@ export function ProfileLayout({ user, onLogout, onSectionChange }: ProfileLayout
                     </CardContent>
                 </Card>
 
-                {/* آیتم‌های منو */}
                 <Card className="p-0">
                     <CardContent className="p-0">
                         {menuItems.map((item, index) => (
@@ -94,7 +91,6 @@ export function ProfileLayout({ user, onLogout, onSectionChange }: ProfileLayout
                     </CardContent>
                 </Card>
 
-                {/* دکمه خروج */}
                 <Button
                     variant="outline"
                     className="w-full flex items-center gap-2 border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"

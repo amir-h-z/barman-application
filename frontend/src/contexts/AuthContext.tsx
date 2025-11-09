@@ -1,5 +1,6 @@
-import React, { createContext, useState, useContext, useEffect, useCallback, ReactNode } from 'react';
-import { User } from '@/types'; // فرض می‌شود تایپ User در این مسیر تعریف شده
+import { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import type { ReactNode } from 'react';
+import type { User } from '@/types';
 import * as authApi from '@/api/auth';
 
 // تعریف نوع داده‌ای که Context نگهداری می‌کند
